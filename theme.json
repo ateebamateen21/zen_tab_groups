@@ -1,5 +1,5 @@
 {
-    "id": "advanced-tab-groups",
+    "id": "zen-tab-groups",
     "name": "Advanced Tab Groups",
     "description": "Tab Groups for Zen Browser",
     "scripts": {
@@ -15,13 +15,13 @@
             "loadOrder": 20
         }
     },
-    "homepage": "https://github.com/Vertex-Mods/Advanced-Tab-Groups",
-    "preferences": "https://raw.githubusercontent.com/Vertex-Mods/Advanced-Tab-Groups/main/preferences.json",
+    "homepage": "https://github.com/ateebamateen21/zen_tab_groups",
+    "preferences": "https://raw.githubusercontent.com/ateebamateen21/zen_tab_groups/main/preferences.json",
     "style": {
         "chrome": "userChrome.css"
     },
-    "readme": "https://raw.githubusercontent.com/Vertex-Mods/Advanced-Tab-Groups/main/README.md",
-    "image": "https://raw.githubusercontent.com/Vertex-Mods/Advanced-Tab-Groups/main/image.png",
+    "readme": "https://raw.githubusercontent.com/ateebamateen21/zen_tab_groups/main/README.md",
+    "image": "https://raw.githubusercontent.com/ateebamateen21/zen_tab_groups/main/image.png",
     "author": "Vertex",
     "version": "3.8.0",
     "tags": [
