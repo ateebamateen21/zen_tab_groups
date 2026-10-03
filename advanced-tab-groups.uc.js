@@ -18,6 +18,7 @@ globalThis._advancedTabGroupsCssPath = (() => {
 
 class AdvancedTabGroups {
   #initTabGroupListener;
+  #userCreatedGroups = new WeakSet();
 
   constructor() {
     this.init();
@@ -62,6 +63,12 @@ class AdvancedTabGroups {
       "TabGroupCreate",
       this.onTabGroupCreate.bind(this)
     );
+    // Firefox fires this only for groups the user makes by hand (not for extensions or
+    // session restore). Used to decide when the rename box should open.
+    document.addEventListener("TabGroupCreateByUser", (event) => {
+      const group = event.target?.closest?.("tab-group") ?? event.target;
+      if (group) this.#userCreatedGroups.add(group);
+    });
     // The native colour setter fires this; when another mod hands a group a native colour code,
     // drop our stale vars right away (see syncGroupColorVars)
     document.addEventListener("TabGroupUpdate", (event) => {
@@ -611,6 +618,25 @@ class AdvancedTabGroups {
     }
   }
 
+  // Open the rename box only for a group the user just made by hand. Groups made by
+  // extensions or session restore never get prompted, so they keep whatever name their
+  // creator gives them. Deferred one tick so it doesn't matter whether Firefox fires
+  // TabGroupCreateByUser before or after TabGroupCreate.
+  maybePromptRename(group) {
+    setTimeout(() => {
+      if (
+        group.isConnected &&
+        !this._groupEdited &&
+        (!group.label ||
+          ("defaultGroupName" in group && group.label === group.defaultGroupName)) &&
+        this.#userCreatedGroups.has(group) &&
+        Services.prefs.getBoolPref("browser.tabs.groups.prompt-rename", true)
+      ) {
+        this.renameGroupStart(group, false); // Don't select all for new groups
+      }
+    }, 0);
+  }
+
   renameGroupStart(group, selectAll = true) {
     // Force clear any existing rename state
     if (this._groupEdited) {
@@ -745,8 +771,8 @@ class AdvancedTabGroups {
       group.label === "" ||
       ("defaultGroupName" in group && group.label === group.defaultGroupName)
     ) {
-      // Start renaming
-      this.renameGroupStart(group, false); // Don't select all for new groups
+      // Start renaming, but only if the user made this group by hand
+      this.maybePromptRename(group);
       // Set color to favicon mode (default for new groups)
       group.color = `${group.id}-favicon`;
       // Set color to average favicon color (default for new groups)
@@ -1568,9 +1594,7 @@ class AdvancedTabGroups {
         group.label === "" ||
         ("defaultGroupName" in group && group.label === group.defaultGroupName)
       ) {
-        if (!this._groupEdited) {
-          this.renameGroupStart(group, false); // Don't select all for new groups
-        }
+        this.maybePromptRename(group);
         // Set color to favicon mode (default for new groups)
         group.color = `${group.id}-favicon`;
         if (typeof group._useFaviconColor === "function") {

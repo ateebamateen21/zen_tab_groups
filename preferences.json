@@ -27,6 +27,12 @@
     "label": "Allow emojis as icons for tab groups"
   },
   {
+    "property": "browser.tabs.groups.prompt-rename",
+    "type": "checkbox",
+    "label": "Ask for a name when I create a group by hand",
+    "default": "true"
+  },
+  {
     "property": "browser.tabs.groups.folder-look",
     "type": "checkbox",
     "label": "Make group headers look like Zen folders (folder icon, open/close animation, active dots)",
